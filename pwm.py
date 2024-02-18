@@ -1,52 +1,83 @@
+import math
 import RPi.GPIO as GPIO
 from time import sleep
-from client import get_value
+from client import get_peaks_value
 
 
 # PINS
 MOTOR_PIN = 12
-MOTOR_FREQ = 70
+
+# Base Frequency 
+# (optimised motor speed)
+BASE_FREQ = 70
+
+# minimum duty to keep ball ready to float
+BASE_DUTY = 60
+
+# starting peak value
+RESET_PEAK = 16
+
+# global PWM control instance
 pi_pwm = None
 
 
-i = 0
-BASE_DUTY = 60
-MAX_PEAK = 16
-MAX_VAL = 16
+counter = 0
+
 RESET_INT = 42
 
 
 def pwm_init():
     global pi_pwm
-    # SETUP
+
     GPIO.setwarnings(False)  # disable warnings
     GPIO.setmode(GPIO.BOARD)  # set pin numbering system
     GPIO.setup(MOTOR_PIN, GPIO.OUT)  # output pin
 
-    pi_pwm = GPIO.PWM(MOTOR_PIN, MOTOR_FREQ)  # create PWM instance with frequency
-    pi_pwm.start(0)
+    pi_pwm = GPIO.PWM(MOTOR_PIN, BASE_FREQ)  # create PWM instance with frequency
+    pi_pwm.start(0) # start PWM output
 
 
+# pwm duty: speed: (60 to 100); x
 speed = lambda x, m: round((-40 / m ** 2) * x ** 2 + (80 / m) * x + BASE_DUTY)
 
 
 def begin():
-    global i
-    max = MAX_PEAK
+    global counter
+
+    max_peak = RESET_PEAK
+
     print("begin...")
+
     while True:
-        if i % 42 == 0:
-            max = MAX_PEAK
-        i += 1
 
-        value = get_value()
+        if counter % RESET_INT == 0:
+            max_peak = RESET_PEAK
 
-        print("val: ", value)
-        max = value if max < value else max
+        counter += 1
 
-        n_value = speed(value, max)
+        # received value from the pc
+        value = get_peaks_value(); print("peak value: ", value)
 
-        print("#", i, "speed: ", n_value, "cur_rate: ", value, "max_rate: ", max)
+        max_peak = value if max_peak < value else max_peak
+
+        n_value = speed(value, max_peak)
+
+        print("#", counter, "speed: ", n_value, "cur_sp-rate: ", value, "max_rate: ", max_peak)
 
         pi_pwm.ChangeDutyCycle(n_value)
+
         sleep(0.01)
+
+def test_loop():
+    speeds = [(round((math.sin(0 + i * ((2 * math.pi) / 100)) + 1) * 50)) for i in range(101)]
+
+    c = 0
+    while True:
+        c += 1
+        speed = speeds[c % len(speeds)]; print("speed: ", speed)
+        pi_pwm.ChangeDutyCycle(speed)
+        sleep(0.01)
+
+
+if __name__ == "__main__":
+    test_loop()

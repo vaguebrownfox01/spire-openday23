@@ -1,13 +1,16 @@
 import socket
 import time
 
+
+# pc parameters
+NAME = "naomi"
+PORT = 1234
+SERVER_IP = "127.0.0.1"
 HEADERSIZE = 5
-SERVER_IP = "192.168.1.138"
-PORT = 12345
-NAME = "pp"
 
 print("Client...")
 
+# global socket instance
 soc = None
 
 
@@ -20,33 +23,36 @@ def get_socket(ip=SERVER_IP, port=PORT, name=NAME):
 
     print(f"HOST: {host}, IP: {name}")
 
+    # connect
     soc.connect((ip, port))
 
     print("Connected...\n")
 
     soc.send(name.encode())
 
-    return soc
 
-
-def get_value(header_size=HEADERSIZE):
+def get_peaks_value():
     global soc
 
     message = soc.recv(1024)
-    msglen = int(message[:HEADERSIZE])
+
+    # print(message)
+
     message = message.decode("utf-8")
 
-    print("this is message: ", message)
+    # print("this is message: ", message)
 
     if message == "":
         print("empty message", message)
         return -1
 
-    if not len(message) - header_size == msglen:
-        print("error in message!")
-        return -1
-
-    message = message.split()[-1]
     value = int(message)
 
     return value
+
+if __name__ == "__main__":
+    get_socket()
+
+    while True:
+        value = get_peaks_value()
+        print('*' * value)
