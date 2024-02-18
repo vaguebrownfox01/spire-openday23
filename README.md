@@ -6,21 +6,24 @@ The Raspberry Pi runs a Python script that records the participant's speech and 
 
 The project is controlled by a Python script that runs on the Raspberry Pi. The script is available on GitHub.
 
-### Requirements
+### Materials used
 
 - Raspberry Pi
 - Python 3
 - Microphone
 - Glass tube
+- Ping-pong ball
+- Stand
+- Motor 12v
 - Fan
 - H bridge
-- Power supply
+- Power supply 12v
 
 ### Usage
 
 1. Speak as fast as you can into the microphone.
 2. The faster you speak, the faster the fan will rotate.
-3. If you speak fast enough, the ping-pong ball will be blown out of the tube.
+3. If you speak fast enough, the ping-pong ball will be blown out of the tube!
 
 I hope you enjoy playing the game!
 

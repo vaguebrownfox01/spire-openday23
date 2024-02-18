@@ -1,14 +1,7 @@
 import socket
 import time
 
-
-# pc parameters
-NAME = "naomi"
-PORT = 1234
-SERVER_IP = "127.0.0.1"
-HEADERSIZE = 5
-
-print("Client...")
+from pong import SERVER_IP, PORT, NAME
 
 # global socket instance
 soc = None
